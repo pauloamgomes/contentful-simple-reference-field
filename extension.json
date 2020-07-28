@@ -1,0 +1,35 @@
+{
+  "id": "simple-reference",
+  "name": "Simple Reference",
+  "srcdoc": "./build/index.html",
+  "fieldTypes": ["Symbol", "Entry"],
+  "parameters": {
+    "instance": [
+      {
+        "id": "limit",
+        "name": "Limit number of entries",
+        "description": "An hard limit of 20 would override this definition",
+        "type": "Symbol",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "id": "display",
+        "name": "Display",
+        "description": "Set field id to be used to display selected entry",
+        "type": "Symbol",
+        "required": true,
+        "default": "title"
+      },
+      {
+        "id": "widget",
+        "name": "Widget Type",
+        "description": "Select the widget type",
+        "type": "Enum",
+        "required": true,
+        "options": [{ "dropdown": "Dropdown" }, { "radios": "Radios" }],
+        "labels": { "empty": "Choose" }
+      }
+    ]
+  }
+}
