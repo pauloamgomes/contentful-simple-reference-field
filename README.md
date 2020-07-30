@@ -8,7 +8,8 @@ So, instead of using the `Reference` field and having to click and select from t
 
 The extension has the following features:
 
-- Change the display widget of a "Single Reference" field to be a Dropdown or Radio buttons
+- Change the display widget of a "Single Reference" field to use a Dropdown or Radio options
+- Change the display widget of "Many references" to use Checkboxes options
 - Supports localization
 
 ## Requirements
@@ -26,7 +27,7 @@ The UI Extension can be installed manually from the Contentful UI following the 
 
 ## Usage
 
-1. Add a new `Reference` (One Reference) field to your content model, it can be localized.
+1. Add a new `Reference` (One Reference or Many Reference) field to your content model, it can be localized.
 2. On validations ensure that `Accept only specified entry type` is selected and only one content type is selected.
 3. On the Appearance tab ensure that `Simple Reference` is selected, and on display option, we define the field we want to show in the dropdown/radios.
 
@@ -66,6 +67,10 @@ The field saved data is the same as the default `Reference` widget, e.g.:
 }
 ```
 
+When using "Many references" it will automatically use checkboxes:
+
+![Checkboxes](https://monosnap.com/image/4tUVZH7SQcnbp2zmEuJRpRWMlali79)
+
 ## Optional Usage for Development
 
 After cloning, install the dependencies
@@ -94,7 +99,7 @@ contentful extension update --force
 
 ## Limitations
 
-Not completely a limitation, as the purpose is to use the widget when referencing a content model that has only a few entries.
+Number of displayed entries. However that's not completely a limitation, as the purpose is to use the widget when referencing a content model that has only a few entries.
 
 ## Copyright and license
 
