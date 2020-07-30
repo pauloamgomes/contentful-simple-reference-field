@@ -2,7 +2,7 @@
   "id": "simple-reference",
   "name": "Simple Reference",
   "srcdoc": "./build/index.html",
-  "fieldTypes": ["Symbol", "Entry"],
+  "fieldTypes": ["Symbol", "Entry", "Entries"],
   "parameters": {
     "instance": [
       {
@@ -24,11 +24,11 @@
       {
         "id": "widget",
         "name": "Widget Type",
-        "description": "Select the widget type",
+        "description": "Use Dropdown/Radios only for single reference",
         "type": "Enum",
-        "required": true,
+        "required": false,
         "options": [{ "dropdown": "Dropdown" }, { "radios": "Radios" }],
-        "labels": { "empty": "Choose" }
+        "labels": { "empty": "Choose one option" }
       }
     ]
   }
