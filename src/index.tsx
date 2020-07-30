@@ -131,6 +131,13 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
       } else {
         oldValue.push(reference);
       }
+
+      oldValue.forEach((ref: Link, idx: number) => {
+        if (!Object.prototype.hasOwnProperty.call(entries, ref.sys.id)) {
+          oldValue.splice(idx, 1);
+        }
+      });
+
       newValue.push(...oldValue);
 
       sdk.entry.fields[fieldName].setValue(newValue, sdk.field.locale);
@@ -145,8 +152,9 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
 
   return (
     <div className="container">
-      {loading && <HelpText>Loading…</HelpText>}
-      {error ? (
+      {loading ? (
+        <HelpText>Loading…</HelpText>
+      ) : error ? (
         <ValidationMessage>Invalid field definition</ValidationMessage>
       ) : sdk.field.type === 'Array' ? (
         <Checkboxes

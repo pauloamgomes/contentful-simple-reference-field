@@ -75,34 +75,47 @@ export const Radios = ({ values, selected, onChange }: Props) => {
   const active = (selected && selected.sys && selected.sys.id) || '';
 
   return (
-    <FieldGroup>
-      {Object.keys(values)
-        .filter((key: string) => {
-          if (values[key].status === 'Archived' && key !== active) {
-            return false;
-          }
-          return true;
-        })
-        .map((key: string) => (
-          <RadioButtonField
-            id={key}
-            name={key}
-            key={`entry-${key}`}
-            value={key}
-            labelText={values[key].display}
-            checked={active.includes(key)}
-            onChange={onChange}
-            labelIsLight
-            helpText={values[key].status}
-            helpTextProps={{ className: `entry-status ${values[key].status.toLowerCase()}` }}
-          />
-        ))}
-    </FieldGroup>
+    <>
+      <FieldGroup>
+        {Object.keys(values)
+          .filter((key: string) => {
+            if (values[key].status === 'Archived' && key !== active) {
+              return false;
+            }
+            return true;
+          })
+          .map((key: string) => (
+            <RadioButtonField
+              id={key}
+              name={key}
+              key={`entry-${key}`}
+              value={key}
+              labelText={values[key].display}
+              checked={active.includes(key)}
+              onChange={onChange}
+              labelIsLight
+              helpText={values[key].status}
+              helpTextProps={{ className: `entry-status ${values[key].status.toLowerCase()}` }}
+            />
+          ))}
+      </FieldGroup>
+      {active && !values[active] && (
+        <div>
+          <ValidationMessage>ENTRY IS MISSING OR INACCESSIBLE</ValidationMessage>
+        </div>
+      )}
+    </>
   );
 };
 
 export const Checkboxes = ({ values, selected, onChange }: ManyLinksProps) => {
   const active = (selected && selected.map((ref: Link) => ref.sys.id)) || [];
+  const allIds = (values && Object.keys(values)) || [];
+
+  console.log(
+    'field',
+    active.every((item: string) => allIds.includes(item))
+  );
 
   return (
     <>
@@ -129,6 +142,11 @@ export const Checkboxes = ({ values, selected, onChange }: ManyLinksProps) => {
             />
           ))}
       </FieldGroup>
+      {active && !active.every((item: string) => allIds.includes(item)) && (
+        <div>
+          <ValidationMessage>AN ENTRY IS MISSING OR INACCESSIBLE</ValidationMessage>
+        </div>
+      )}
     </>
   );
 };
