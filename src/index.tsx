@@ -2,26 +2,16 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import * as React from 'react';
 import { render } from 'react-dom';
-import { init, FieldExtensionSDK } from 'contentful-ui-extensions-sdk';
-import { Spinner, ValidationMessage } from '@contentful/forma-36-react-components';
+import { init, FieldExtensionSDK, Link } from 'contentful-ui-extensions-sdk';
+import { HelpText, ValidationMessage } from '@contentful/forma-36-react-components';
 import '@contentful/forma-36-react-components/dist/styles.css';
 //
 import './index.css';
-import { Dropdown, Radios } from './widgets';
+import { Dropdown, Radios, Checkboxes } from './widgets';
 
 interface SimpleReferenceProps {
   sdk: FieldExtensionSDK;
 }
-
-type LinkValueType = {
-  id: string;
-  type: string;
-  linkType: string;
-};
-
-type LinkType = {
-  sys: LinkValueType;
-};
 
 type EntryType = {
   display: string;
@@ -49,36 +39,54 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
   const instance: any = sdk.parameters.instance;
   const { display, limit, widget } = instance;
 
-  const [value, setValue] = React.useState({} as LinkType);
+  const [value, setValue] = React.useState(null as Link | Link[] | null);
   const [entries, setEntries] = React.useState({} as Record<string, EntryType>);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(false);
 
   React.useEffect(() => {
     sdk.window.startAutoResizer();
 
-    const validations: any = sdk.field.validations[0];
-    const contentType = validations.linkContentType[0];
+    const validations: any[] =
+      sdk.field.type === 'Array'
+        ? (sdk.field.items && sdk.field.items.validations) || []
+        : sdk.field.validations;
+    const contentType: string | null =
+      validations.find((validation: any) => !!validation.linkContentType)['linkContentType'] ||
+      null;
 
-    const query = {
-      content_type: contentType,
-      limit: limit && limit < 20 ? limit : 20
-    };
+    if (contentType) {
+      const query = {
+        content_type: contentType,
+        limit: limit && limit < 20 ? limit : 20
+      };
 
-    sdk.space.getEntries(query).then((result: any) => {
-      const newEntries: Record<string, EntryType> = {};
-      const locale = sdk.field.locale;
-      const defaultLocale = sdk.locales.default;
-      result.items.forEach((item: any) => {
-        const { sys, fields } = item;
-        newEntries[sys.id] = {
-          display: fields[display][locale] || fields[display][defaultLocale] || 'N/A',
-          status: getStatus(item)
-        };
+      sdk.space.getEntries(query).then((result: any) => {
+        const newEntries: Record<string, EntryType> = {};
+        const locale = sdk.field.locale;
+        const defaultLocale = sdk.locales.default;
+
+        try {
+          result.items.forEach((item: any) => {
+            const { sys, fields } = item;
+
+            newEntries[sys.id] = {
+              display: fields[display][locale] || fields[display][defaultLocale] || 'N/A',
+              status: getStatus(item)
+            };
+          });
+
+          setEntries(newEntries);
+        } catch (err) {
+          console.error(err);
+          setError(true);
+        }
+        setLoading(false);
       });
-
-      setEntries(newEntries);
+    } else {
+      setError(true);
       setLoading(false);
-    });
+    }
 
     // Handler for external field value changes (e.g. when multiple authors are working on the same entry).
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,47 +101,63 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
 
   const updateFieldValue = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
-      const value: LinkType = {
+      const reference: Link = {
         sys: {
           type: 'Link',
           linkType: 'Entry',
           id: e.target.value
         }
       };
-      setValue(value);
-      sdk.entry.fields[fieldName].setValue(value, sdk.field.locale);
+      sdk.entry.fields[fieldName].setValue(reference, sdk.field.locale);
     } else {
-      setValue({} as LinkType);
       sdk.entry.fields[fieldName].removeValue();
     }
   };
 
-  const onExternalChange = (value: LinkType) => {
+  const updateFieldValues = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value) {
+      const reference: Link = {
+        sys: {
+          type: 'Link',
+          linkType: 'Entry',
+          id: e.target.value
+        }
+      };
+      const newValue: Link[] = [];
+      const oldValue = (value && [...(value as Link[])]) || [];
+      const idx = oldValue.findIndex((ref: Link) => ref.sys.id === e.target.value);
+      if (idx !== -1) {
+        oldValue.splice(idx, 1);
+      } else {
+        oldValue.push(reference);
+      }
+      newValue.push(...oldValue);
+
+      sdk.entry.fields[fieldName].setValue(newValue, sdk.field.locale);
+    } else {
+      sdk.entry.fields[fieldName].removeValue();
+    }
+  };
+
+  const onExternalChange = (value: Link | Link[] | null) => {
     setValue(value);
   };
 
-  const active = (value && value.sys && value.sys.id) || '';
-
   return (
     <div className="container">
-      {loading ? (
-        <div>
-          Loading <Spinner size="default" />
-        </div>
+      {loading && <HelpText>Loading…</HelpText>}
+      {error ? (
+        <ValidationMessage>Invalid field definition</ValidationMessage>
+      ) : sdk.field.type === 'Array' ? (
+        <Checkboxes
+          values={entries}
+          selected={value as Link[] | null}
+          onChange={updateFieldValues}
+        />
+      ) : widget === 'radios' ? (
+        <Radios values={entries} selected={value as Link | null} onChange={updateFieldValue} />
       ) : (
-        <>
-          {widget === 'dropdown' && (
-            <Dropdown values={entries} selected={active} onChange={updateFieldValue} />
-          )}
-          {widget === 'radios' && (
-            <Radios values={entries} selected={active} onChange={updateFieldValue} />
-          )}
-          {active && !entries[active] && (
-            <div>
-              <ValidationMessage>ENTRY IS MISSING OR INACCESSIBLE</ValidationMessage>
-            </div>
-          )}
-        </>
+        <Dropdown values={entries} selected={value as Link | null} onChange={updateFieldValue} />
       )}
     </div>
   );
