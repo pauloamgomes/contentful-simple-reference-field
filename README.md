@@ -10,6 +10,7 @@ The extension has the following features:
 
 - Change the display widget of a "Single Reference" field to use a Dropdown or Radio options
 - Change the display widget of "Many references" to use Checkboxes options
+- Support for pre-filtering of referenced entries using Contentful query filter format
 - Supports localization
 
 ## Requirements
@@ -31,7 +32,7 @@ The UI Extension can be installed manually from the Contentful UI following the 
 2. On validations ensure that `Accept only specified entry type` is selected and only one content type is selected.
 3. On the Appearance tab ensure that `Simple Reference` is selected, and on display option, we define the field we want to show in the dropdown/radios.
 
-![Appearance](https://monosnap.com/image/OZhKG0zmHb3ClMsd2yTbThb5yy3EPk)
+![Appearance](https://monosnap.com/image/N3BOZQUICrjPSKMegJQhBLnDeMri6G)
 
 When creating/editing an entry where the field is defined it will display the references:
 
