@@ -8,7 +8,7 @@
       {
         "id": "limit",
         "name": "Limit number of entries",
-        "description": "An hard limit of 20 would override this definition",
+        "description": "An hard limit of 100 would override this definition",
         "type": "Symbol",
         "required": false,
         "default": "20"
@@ -29,6 +29,14 @@
         "required": false,
         "options": [{ "dropdown": "Dropdown" }, { "radios": "Radios" }],
         "labels": { "empty": "Choose one option" }
+      },
+      {
+        "id": "filter",
+        "name": "Filter Query",
+        "description": "Set one or more filters (separated by |) to be applied when retrieving the collection entries. (e.g. fields.channel.sys.contentType.sys.id:name|fields.channel.fields.name[match]:web)",
+        "type": "Symbol",
+        "required": false,
+        "default": "title"
       }
     ]
   }

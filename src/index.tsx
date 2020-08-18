@@ -37,7 +37,7 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
 
   const fieldName = sdk.field.id;
   const instance: any = sdk.parameters.instance;
-  const { display, limit, widget } = instance;
+  const { display, limit, widget, filter } = instance;
 
   const [value, setValue] = React.useState(null as Link | Link[] | null);
   const [entries, setEntries] = React.useState({} as Record<string, EntryType>);
@@ -56,10 +56,20 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
       null;
 
     if (contentType) {
-      const query = {
+      const query: any = {
         content_type: contentType,
-        limit: limit && limit < 20 ? limit : 20
+        limit: limit && limit < 100 ? limit : 100
       };
+
+      filter.split('|').forEach((piece: string) => {
+        const [key, value] = piece.split(':');
+
+        if (key && value) {
+          query[key] = value;
+        }
+      });
+
+      console.log('query', query);
 
       sdk.space.getEntries(query).then((result: any) => {
         const newEntries: Record<string, EntryType> = {};
