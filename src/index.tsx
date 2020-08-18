@@ -69,8 +69,6 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
         }
       });
 
-      console.log('query', query);
-
       sdk.space.getEntries(query).then((result: any) => {
         const newEntries: Record<string, EntryType> = {};
         const locale = sdk.field.locale;
