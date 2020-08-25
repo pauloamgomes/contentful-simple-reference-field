@@ -31,12 +31,20 @@
         "labels": { "empty": "Choose one option" }
       },
       {
+        "id": "defaultValue",
+        "name": "Default Value (regex)",
+        "description": "Use a valid regex (tested against display field and contentful id) to pre-select items e.g. (id1|id2|id3) or (web|cms|media.*)",
+        "type": "Symbol",
+        "required": false,
+        "default": ""
+      },
+      {
         "id": "filter",
         "name": "Filter Query",
         "description": "Set one or more filters (separated by |) to be applied when retrieving the collection entries. (e.g. fields.channel.sys.contentType.sys.id:name|fields.channel.fields.name[match]:web)",
         "type": "Symbol",
         "required": false,
-        "default": "title"
+        "default": ""
       }
     ]
   }

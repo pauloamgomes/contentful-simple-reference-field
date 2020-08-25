@@ -37,9 +37,10 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
 
   const fieldName = sdk.field.id;
   const instance: any = sdk.parameters.instance;
-  const { display, limit, widget, filter } = instance;
+  const { display, limit, widget, defaultValue, filter } = instance;
 
   const [value, setValue] = React.useState(null as Link | Link[] | null);
+  const [defaults, setDefaults] = React.useState([] as string[]);
   const [entries, setEntries] = React.useState({} as Record<string, EntryType>);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(false);
@@ -73,8 +74,11 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
         const newEntries: Record<string, EntryType> = {};
         const locale = sdk.field.locale;
         const defaultLocale = sdk.locales.default;
+        const checkedIds: string[] = [];
 
         try {
+          const regex = new RegExp(`${defaultValue}`, 'i');
+
           result.items.forEach((item: any) => {
             const { sys, fields } = item;
 
@@ -82,9 +86,14 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
               display: fields[display][locale] || fields[display][defaultLocale] || 'N/A',
               status: getStatus(item)
             };
+
+            if (defaultValue && (regex.test(newEntries[sys.id].display) || regex.test(sys.id))) {
+              checkedIds.push(sys.id);
+            }
           });
 
           setEntries(newEntries);
+          setDefaults(checkedIds);
         } catch (err) {
           console.error(err);
           setError(true);
@@ -169,11 +178,22 @@ export const SimpleReference = ({ sdk }: SimpleReferenceProps) => {
           values={entries}
           selected={value as Link[] | null}
           onChange={updateFieldValues}
+          defaultValue={defaults}
         />
       ) : widget === 'radios' ? (
-        <Radios values={entries} selected={value as Link | null} onChange={updateFieldValue} />
+        <Radios
+          values={entries}
+          selected={value as Link | null}
+          onChange={updateFieldValue}
+          defaultValue={defaults && defaults[0]}
+        />
       ) : (
-        <Dropdown values={entries} selected={value as Link | null} onChange={updateFieldValue} />
+        <Dropdown
+          values={entries}
+          selected={value as Link | null}
+          onChange={updateFieldValue}
+          defaultValue={defaults && defaults[0]}
+        />
       )}
     </div>
   );

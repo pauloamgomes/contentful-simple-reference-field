@@ -20,16 +20,18 @@ type SingeLinkProps = {
   values: Record<string, EntryType>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selected: Link | null;
+  defaultValue: string | null;
 };
 
 type ManyLinksProps = {
   values: Record<string, EntryType>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selected: Link[] | null;
+  defaultValue: string[] | null;
 };
 
-export const Dropdown = ({ values, onChange, selected }: SingeLinkProps) => {
-  const active = (selected && selected.sys && selected.sys.id) || '';
+export const Dropdown = ({ values, onChange, selected, defaultValue }: SingeLinkProps) => {
+  const active = (selected && selected.sys && selected.sys.id) || defaultValue || '';
 
   return (
     <>
@@ -71,8 +73,8 @@ export const Dropdown = ({ values, onChange, selected }: SingeLinkProps) => {
   );
 };
 
-export const Radios = ({ values, selected, onChange }: Props) => {
-  const active = (selected && selected.sys && selected.sys.id) || '';
+export const Radios = ({ values, selected, onChange, defaultValue }: SingeLinkProps) => {
+  const active = (selected && selected.sys && selected.sys.id) || defaultValue || '';
 
   return (
     <>
@@ -108,14 +110,9 @@ export const Radios = ({ values, selected, onChange }: Props) => {
   );
 };
 
-export const Checkboxes = ({ values, selected, onChange }: ManyLinksProps) => {
-  const active = (selected && selected.map((ref: Link) => ref.sys.id)) || [];
+export const Checkboxes = ({ values, selected, onChange, defaultValue }: ManyLinksProps) => {
+  const active = (selected && selected.map((ref: Link) => ref.sys.id)) || defaultValue || [];
   const allIds = (values && Object.keys(values)) || [];
-
-  console.log(
-    'field',
-    active.every((item: string) => allIds.includes(item))
-  );
 
   return (
     <>
